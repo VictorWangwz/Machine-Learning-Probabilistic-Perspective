@@ -12,8 +12,10 @@ t = size(Xtest,1)
 Xtest = [ones(t,1) Xtest]
 
 # Fit one-vs-all logistic regression model
-include("logReg.jl")
-model = logRegOnevsAll(X,y)
+# include("logReg.jl")
+# model = logRegOnevsAll(X,y)
+include("softmax.jl")
+model = softmaxClassifier(X, y)
 
 # Compute training and validation error
 using Statistics
@@ -28,3 +30,6 @@ validError = mean(yhat .!= ytest)
 k = maximum(y)
 include("plot2Dclassifier.jl")
 plot2Dclassifier(X,y,model,Xtest=Xtest,ytest=ytest,biasIncluded=true,k=5)
+
+
+display(gcf())
