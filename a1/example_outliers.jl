@@ -1,11 +1,14 @@
+
 # Load X and y variable
 using JLD, Statistics, Printf
 data = load("outliersData.jld")
 (X,y,Xtest,ytest) = (data["X"],data["y"],data["Xtest"],data["ytest"])
 
 # Fit a least squares model
-include("leastSquares.jl")
-model = leastSquares(X,y)
+# include("leastSquares.jl")
+# model = leastSquares(X,y)
+include("leastAbsolutes.jl")
+model = leastAbsolutes(X,y)
 
 # Evaluate training error
 yhat = model.predict(X)
@@ -24,3 +27,5 @@ plot(X,y,"b.")
 Xhat = minimum(X):.01:maximum(X)
 yhat = model.predict(Xhat)
 plot(Xhat,yhat,"g")
+show()
+display(gcf())

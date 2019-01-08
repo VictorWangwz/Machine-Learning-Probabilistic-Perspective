@@ -33,11 +33,14 @@ let minError = Inf
 
         end
     end
-    print(minError)
+    
     model = leastSquaresRBFL2(Xtrain, ytrain, optiomalSigma, optimalLambda)
     
     # Report the error on the test set
     using Printf
+    # print(minError,"/n")
+    # print(optimalLambda,"/n")
+    print(optiomalSigma)
     t = size(Xvalid,1)
     yhat = model.predict(Xvalid)
     testError = sum((yhat - yvalid).^2)/t
