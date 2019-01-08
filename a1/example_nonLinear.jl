@@ -11,8 +11,8 @@ data = load("nonLinear.jld")
 # model = leastSquares(X,y)
 
 include("rbfLeastSquares.jl")
-sigma = 1
-lambda = 1
+sigma = 0.5
+lambda = 7.62939453125e-6
 model = leastSquaresRBFL2(X, y, sigma, lambda)
 
 # Report the error on the test set
