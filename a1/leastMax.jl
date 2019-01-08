@@ -1,14 +1,14 @@
 include("misc.jl")
-using MathProgBase, GLPKMathProgInterface, Clp
+using MathProgBase, Clp
 using LinearAlgebra
-function leastAbsolutes(X,y)
+function leastMax(X,y)
 
 	# Add bias column
 	(n,d) = size(X)
 	Z = [ones(n,1) X]
     print(size(Z))
-    rx = [zeros(d+1,1); ones(n,1)]
-    A = [Z -I; -Z -I]
+    rx = [zeros(d+1,1); ones(1,1)]
+    A = [Z -ones(n,1); -Z -ones(n,1)]
     b = [y; -y]
     print(size(A))
     sense = fill(-Inf, (2*n, 1))
@@ -21,4 +21,3 @@ function leastAbsolutes(X,y)
 	# Return model
 	return LinearModel(predict,w)
 end
-
