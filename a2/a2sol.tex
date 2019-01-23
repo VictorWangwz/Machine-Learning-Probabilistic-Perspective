@@ -1,0 +1,167 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{listings} % For displaying code
+\usepackage{algorithm2e} % pseudo-code
+
+% Answers
+\def\ans#1{\par\gre{Answer: #1}}
+%\def\ans#1{} % Comment this line to produce document with answers
+
+% Colors
+\definecolor{blu}{rgb}{0,0,1}
+\def\blu#1{{\color{blu}#1}}
+\definecolor{gre}{rgb}{0,.5,0}
+\def\gre#1{{\color{gre}#1}}
+\definecolor{red}{rgb}{1,0,0}
+\def\red#1{{\color{red}#1}}
+\def\norm#1{\|#1\|}
+
+% Math
+\def\R{\mathbb{R}}
+\def\argmax{\mathop{\rm arg\,max}}
+\newcommand{\argmin}[1]{\mathop{\hbox{argmin}}_{#1}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\alignStar}[1]{\begin{align*}#1\end{align*}}
+\def\half{\frac 1 2}
+
+% LaTeX
+\newcommand{\fig}[2]{\includegraphics[width=#1\textwidth]{a2f/#2}}
+\newcommand{\centerfig}[2]{\begin{center}\includegraphics[width=#1\textwidth]{a2f/#2}\end{center}}
+\def\items#1{\begin{itemize}#1\end{itemize}}
+\def\enum#1{\begin{enumerate}#1\end{enumerate}}
+
+
+\begin{document}
+
+\title{CPSC 540 Assignment 2 (due February 1 at midnight)}
+\author{}
+\date{}
+\maketitle
+\vspace{-4em}
+
+The assignment instructions are the same as for the previous assignment, but for this assignment you can work in groups of 1-3. However, please only hand in one assignment for the group.
+
+
+\blu{\enum{
+\item Name(s):
+\item Student ID(s):
+}}
+
+
+
+
+\section{Calculation Questions}
+
+
+\subsection{Convexity}
+
+\blu{Show that the following functions are convex, by only using one of the definitions of convexity (i.e., without using the ``operations that preserve convexity" or using convexity results stated in class)}:\footnote{That $C^0$ convex functions are below their chords, that $C^1$ convex functions are above their tangents, or that $C^2$ convex functions have a positive semidefinite Hessian.}
+\enum{
+\item L2-regularized weighted least squares: $f(w) = \half(Xw - y)^\top V(Xw-y)  + \frac \lambda 2 \norm{w}^2$.\\($V$ is a diagonal matrix with positive values on the diagonal).
+\item Poisson regression: $f(w) = -y^\top Xw + 1^\top v$ (where $v_i = \exp(w^\top x^i)$).
+\item Weighted infinity-norm: $f(w) = \max_{j \in \{1,2,\dots,d\}}L_j|w_j|$.\\
+Hint: Max and aboluste value are not differentiable in general, so you cannot use the Hessian for this question.
+}
+
+\blu{Show that the following functions are convex (you can use results from class and operations that preserve convexity if they help)}:
+\enum{
+\setcounter{enumi}{3}
+\item Regularized regression with arbitrary $p$-norm and weighted $q$-norm: $f(w) = \norm{Xw - y}_p + \lambda\norm{Aw}_q$.
+\item Support vector regression: $f(w) = \sum_{i=1}^N\max\{0, |w^\top x_i - y_i| - \epsilon\} + \frac{\lambda}{2}\norm{w}_2^2$.
+\item Indicator function for linear constraints: $f(w) = \begin{cases}0 & \text{if $Aw \leq b$}\\\infty & \text{otherwise}\end{cases}$.
+}
+
+
+
+\subsection{Convergence of Gradient Descent}
+
+For these questions it will be helpful to use the ``convexity inequalities'' notes posted on the webpage.
+
+\enum{
+\item In class we showed that if $\nabla f$ is $L$-Lipschitz continuous and $f$ is bounded below then with a step-size of $1/L$ gradient descent is guaranteed to have found a $w^k$ with $\norm{\nabla f(w^k)}^2 \leq \epsilon$ after $t = O(1/\epsilon)$ iterations. Suppose that a more-clever algorithm exists which, on iteration $t$, is guaranteed to have found a $w^k$ satisfying $\norm{\nabla f(w^k)}^2 \leq 2L(f(w^0) - f^*)/t^{4/3}$. \blu{How many iterations of this algorithm would we need to find a $w^k$ with $\norm{\nabla f(w^k)}^2 \leq \epsilon$?}
+\item In practice we typically don't know $L$. A common strategy in this setting is to start with some small guess $L^0$ that we know is smaller than the true $L$ (usually we take $L^0=1$). On each iteration $k$, we initialize with $L^k = L^{k-1}$ and we check the inequality
+\[
+f\left(w^k - \frac{1}{L^k}\nabla f(w^k)\right) \leq f(w^k) - \frac{1}{2L^k}\norm{\nabla f(w^k)}^2.
+\]
+If this is not satisfied, we double $L^k$ and test it again. This continues until we have an $L^k$ satisfying the inequality, and then we take the step. \blu{Show that gradient descent with $\alpha_k = 1/L^k$ defined in this way has a linear convergence rate of
+\[
+f(w^k) - f(w^*) \leq \left(1 - \frac{\mu}{2L}\right)^k[f(w^0) - f(w^*)],
+\]
+\red{if $\nabla f$ is $L$-Lipschitz continuousn and $f$ is $\mu$-strongly convex.}\\
+} Hint: if a function is $L$-Lipschitz continuous that it is also $L'$-Lipschitz continuous for any $L' \geq L$.
+\item Suppose that, in the previous question, we initialized with $L^k = \red{\half}L^{k-1}$. \blu{Describe a setting where this could work much better}.
+\item In class we showed that if $\nabla f$ is $L$-Lipschitz continuous and $f$ is strongly-convex, then with a step-size of $\alpha_k = 1/L$ gradient descent has a convergence rate of 
+\[
+f(w^k) - f(w^*) = O(\rho^k).
+\]
+\blu{Show that under these assumptions that a convergence rate of $O(\rho^k)$ in terms of the function values implies that the iterations have a convergence rate of
+\[
+\norm{w^k - w^*} = O(\rho^{k/2}).
+\]}
+}
+
+
+
+
+\subsection{Beyond Gradient Descent}
+
+
+\enum{
+\item We can write the proximal-gradient update as
+\begin{align*}
+w^{k+\half} & = w^k - \alpha_k \nabla f(w^k)\\
+w^{k+1} &= \argmin{v\in\R^d}\left\{\frac{1}{2}\norm{v -w^{k+\half}}^2 + \alpha_kr(v)\right\}.
+\end{align*}
+\blu{Show that this is equivalent to setting
+\[
+w^{k+1} \in \argmin{v\in\R^d} \left\{ f(w^k) + \nabla f(w^k)^\top (v-w^k) + \frac{1}{2\alpha_k}\norm{v-w^k}^2  +r(v)\right\}.
+\]
+}
+\item The ``sum'' version of multi-class SVMs uses an objective of the form
+\[
+f(W) = \sum_{i=1}^n \sum_{c \neq y^i}[1 - w_{y^i}^\top x^i + w_c^\top x^i]^+ + \frac \lambda 2 \norm{W}_F^2,
+\]
+where $[\gamma]^+$ sets negative values to zero (and you can use $k$ as the number of classes so the inner loop is over $(k-1)$ elements). \blu{Derive the sub-differential of this objetive}.
+\item In some situations it might be hard to accurately compute the elements of the gradient, but we might have access to the sign of the gradient (this can also be useful in distributed settings where communicating one bit for each element of the gradient is cheaper than communicating a floating point number for each gradient element). 
+Consider an $f$ that is bounded below and where $\nabla f$ is Lipschitz continuous in the $\infty$-norm, meaning that
+\[
+f(v) \leq f(u) + \nabla f(u)^\top (v-u) + \frac{L_\infty}{2}\norm{v-u}_\infty^2,
+\]
+for all $v$ and $w$ and some $L_\infty$. 
+For this setting, consider a sign-based gradient descent algorithm of the form
+\[
+w^{k+1} = w^k - \frac{\norm{\nabla f(w^k)}_1}{L_\infty}\text{sign}(\nabla f(w^k)),
+\]
+where we define the sign function element-wise as
+\[
+\text{sign}(w_j) = \begin{cases}+1 & w_j > 0\\0 & w_j =0\\-1 & w_j < 0\end{cases},
+\]
+\blu{Show that this sign-based gradient descent algorithm finds a $w^k$ satisfying \red{$\norm{\nabla f(w^k)}^2 \leq \epsilon$} after $t = O(1/\epsilon)$ iterations.}
+}
+
+
+\section{Computation Questions}
+
+Coming soon....
+
+
+
+
+
+\section{Very-Short Answer Questions}
+
+Coming soon...
+
+
+
+ 
+\end{document}
