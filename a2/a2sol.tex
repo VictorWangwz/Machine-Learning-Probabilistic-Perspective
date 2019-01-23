@@ -52,8 +52,8 @@ The assignment instructions are the same as for the previous assignment, but for
 
 
 \blu{\enum{
-\item Name(s):
-\item Student ID(s):
+\item Name(s): Zhen Wang, Hongru Li
+\item Student ID(s): 98552169
 }}
 
 
@@ -67,17 +67,37 @@ The assignment instructions are the same as for the previous assignment, but for
 \blu{Show that the following functions are convex, by only using one of the definitions of convexity (i.e., without using the ``operations that preserve convexity" or using convexity results stated in class)}:\footnote{That $C^0$ convex functions are below their chords, that $C^1$ convex functions are above their tangents, or that $C^2$ convex functions have a positive semidefinite Hessian.}
 \enum{
 \item L2-regularized weighted least squares: $f(w) = \half(Xw - y)^\top V(Xw-y)  + \frac \lambda 2 \norm{w}^2$.\\($V$ is a diagonal matrix with positive values on the diagonal).
+\gre{
+\\ Answer: $\nabla ^2 f(w) = X^\top VX + \lambda I>0$. Thus $f(w)$ is convex.
+}
 \item Poisson regression: $f(w) = -y^\top Xw + 1^\top v$ (where $v_i = \exp(w^\top x^i)$).
+\gre{
+\\ Answer: $f(w) =  -y^\top Xw + \sum v_i$, $\nabla^2f(w) = 0 + r$ where $r$ is $d*1$ matrix and each $d_j = \sum_{i=1}^n (x_j^i)^2exp(w^\top x^i)>0$. Thus $\nabla^2f(w)>0$. Thus $f(w)$ is convex.
+}
 \item Weighted infinity-norm: $f(w) = \max_{j \in \{1,2,\dots,d\}}L_j|w_j|$.\\
 Hint: Max and aboluste value are not differentiable in general, so you cannot use the Hessian for this question.
+\gre{
+\\ Answer: \begin{align*}
+f(\theta w+(1-\theta)v) &= \max_{j \in \{1,2,\dots,d\}} L_j|\theta w_j +(1-\theta) v_j|\\ &\leq \max_{j \in \{1,2,\dots,d\}} L_j(\theta | w_j |+(1-\theta) |v_j|)\\ &= \max_{j \in \{1,2,\dots,d\}} \theta L_j | w_j |+(1-\theta) L_j |v_j|\\ &\leq \max_{j \in \{1,2,\dots,d\}} \theta L_j | w_j |+\max_{j \in \{1,2,\dots,d\}}(1-\theta) L_j |v_j|\\ &= \theta f(w) +(1-\theta) f(v) 
+\end{align*}. Thus it is convex.
+}
 }
 
 \blu{Show that the following functions are convex (you can use results from class and operations that preserve convexity if they help)}:
 \enum{
 \setcounter{enumi}{3}
 \item Regularized regression with arbitrary $p$-norm and weighted $q$-norm: $f(w) = \norm{Xw - y}_p + \lambda\norm{Aw}_q$.
+\gre{
+\\ Answer: All norms are convex and sum of convex functions is convex. Thus $f(w)$ is convex.
+}
 \item Support vector regression: $f(w) = \sum_{i=1}^N\max\{0, |w^\top x_i - y_i| - \epsilon\} + \frac{\lambda}{2}\norm{w}_2^2$.
+\gre{
+\\Answer: Square of norm is convex thus $\frac{\lambda}{2}\norm{w}_2^2$ is convex for $\lambda>0$. $|w^\top x_i - y_i|$ is convex thus $|w^\top x_i - y_i| - \epsilon$ is convex. As 0 is convex and maximum of convex functions is also convex, thus $\max\{0, |w^\top x_i - y_i| - \epsilon\}$ is convex. Sum of convex functions is convex, thus $f(w)$ is convex.
+}
 \item Indicator function for linear constraints: $f(w) = \begin{cases}0 & \text{if $Aw \leq b$}\\\infty & \text{otherwise}\end{cases}$.
+\gre{
+\\ Answer: If $Aw \leq b$ and $Av \leq b$, $A(\theta w + (1-\theta) v) \leq A(\max(w, v)) \leq b$, so $f(\theta w + (1-\theta) v)=0=\theta f(w) + (1-\theta)f(v)$. If one or both of $Aw > b$ and $Av > b$, $\theta f(w) + (1-\theta)f(v) = \infty$. So $f(\theta w + (1-\theta) v) \leq \theta f(w) + (1-\theta)f(v)$. Thus $f(w)$ is convex.
+}
 }
 
 
@@ -88,6 +108,9 @@ For these questions it will be helpful to use the ``convexity inequalities'' not
 
 \enum{
 \item In class we showed that if $\nabla f$ is $L$-Lipschitz continuous and $f$ is bounded below then with a step-size of $1/L$ gradient descent is guaranteed to have found a $w^k$ with $\norm{\nabla f(w^k)}^2 \leq \epsilon$ after $t = O(1/\epsilon)$ iterations. Suppose that a more-clever algorithm exists which, on iteration $t$, is guaranteed to have found a $w^k$ satisfying $\norm{\nabla f(w^k)}^2 \leq 2L(f(w^0) - f^*)/t^{4/3}$. \blu{How many iterations of this algorithm would we need to find a $w^k$ with $\norm{\nabla f(w^k)}^2 \leq \epsilon$?}
+\gre{
+\\ Answer:$\norm{\nabla f(w^k)}^2 \leq 2L(f(w^0) - f^*)/t^{4/3}\leq \epsilon$. Thus $t \geq (\epsilon/(2L(f(w^0) - f^*)))^{3/4}$.
+}
 \item In practice we typically don't know $L$. A common strategy in this setting is to start with some small guess $L^0$ that we know is smaller than the true $L$ (usually we take $L^0=1$). On each iteration $k$, we initialize with $L^k = L^{k-1}$ and we check the inequality
 \[
 f\left(w^k - \frac{1}{L^k}\nabla f(w^k)\right) \leq f(w^k) - \frac{1}{2L^k}\norm{\nabla f(w^k)}^2.
@@ -98,6 +121,14 @@ f(w^k) - f(w^*) \leq \left(1 - \frac{\mu}{2L}\right)^k[f(w^0) - f(w^*)],
 \]
 \red{if $\nabla f$ is $L$-Lipschitz continuousn and $f$ is $\mu$-strongly convex.}\\
 } Hint: if a function is $L$-Lipschitz continuous that it is also $L'$-Lipschitz continuous for any $L' \geq L$.
+\gre{
+\\ Answer:\begin{align*}
+f(w^{k})-f(w^*) &\leq f(w^{k-1})-f(w^*)-\frac{1}{2L^{k-1}}(2\mu(f(w^{k-1})-f(w^*))) \\
+ & = (1-\frac{\mu}{L^{k-1}})(f(w^{k-1})-f(w^*))\\
+ & \leq \prod_{i=0}^{k-1}(1-\frac{\mu}{L^i})(f(w^0)-f(w^*))\\
+ & \leq \left(1 - \frac{\mu}{2L}\right)^k[f(w^0) - f(w^*)]
+\end{align*}
+}
 \item Suppose that, in the previous question, we initialized with $L^k = \red{\half}L^{k-1}$. \blu{Describe a setting where this could work much better}.
 \item In class we showed that if $\nabla f$ is $L$-Lipschitz continuous and $f$ is strongly-convex, then with a step-size of $\alpha_k = 1/L$ gradient descent has a convergence rate of 
 \[
@@ -126,11 +157,31 @@ w^{k+1} &= \argmin{v\in\R^d}\left\{\frac{1}{2}\norm{v -w^{k+\half}}^2 + \alpha_k
 w^{k+1} \in \argmin{v\in\R^d} \left\{ f(w^k) + \nabla f(w^k)^\top (v-w^k) + \frac{1}{2\alpha_k}\norm{v-w^k}^2  +r(v)\right\}.
 \]
 }
+\gre{
+\\Answer: 
+\begin{align*}
+w^{k+1}& \in \argmin{v\in\R^d} \left\{ f(w^k) + \nabla f(w^k)^\top (v-w^k) + \frac{1}{2\alpha_k}\norm{v-w^k}^2  +r(v)\right\}\\
+&\in\argmin{v\in\R^d} \left\{ \alpha_k f(w^k) + \alpha_k\nabla f(w^k)^\top (v-w^k) + \frac{1}{2}\norm{v-w^k}^2  +\alpha_k r(v)\right\}\\
+&\in\argmin{v\in\R^d} \left\{ 2\alpha_k f(w^k) + 2\alpha_k\nabla f(w^k)^\top (v-w^k) + \norm{v-w^k}^2  +2\alpha_k r(v)\right\}\\
+&\in\argmin{v\in\R^d} \left\{ \alpha_k^2 (\nabla f(w^k))^2 + 2\alpha_k\nabla f(w^k)^\top (v-w^k) + \norm{v-w^k}^2  +2\alpha_k r(v)\right\}\\
+&\in\argmin{v\in\R^d} \left\{\frac{1}{2}(\norm{v-w^k + \alpha_k\nabla f(w^k)}^2) +\alpha_k r(v)\right\}\\
+&\in\argmin{v\in\R^d} \left\{\frac{1}{2}(\norm{v-(w^k - \alpha_k\nabla f(w^k)}^2)) +\alpha_k r(v)\right\}\\
+\end{align*}
+This is the same as
+\begin{align*}
+w^{k+\half} & = w^k - \alpha_k \nabla f(w^k)\\
+w^{k+1} &= \argmin{v\in\R^d}\left\{\frac{1}{2}\norm{v -w^{k+\half}}^2 + \alpha_kr(v)\right\}.
+\end{align*}
+}
 \item The ``sum'' version of multi-class SVMs uses an objective of the form
 \[
 f(W) = \sum_{i=1}^n \sum_{c \neq y^i}[1 - w_{y^i}^\top x^i + w_c^\top x^i]^+ + \frac \lambda 2 \norm{W}_F^2,
 \]
 where $[\gamma]^+$ sets negative values to zero (and you can use $k$ as the number of classes so the inner loop is over $(k-1)$ elements). \blu{Derive the sub-differential of this objetive}.
+\gre{
+\\Answer: Let $L_i = \sum_{c \neq y^i}[1 - w_{y^i}^\top x^i + w_c^\top x^i]^+$. The sub-gradient of $L_i$ is \\
+$f(w) = \begin{cases}0 & \text{if $Aw \leq b$}\\\infty & \text{otherwise}\end{cases}$
+}
 \item In some situations it might be hard to accurately compute the elements of the gradient, but we might have access to the sign of the gradient (this can also be useful in distributed settings where communicating one bit for each element of the gradient is cheaper than communicating a floating point number for each gradient element). 
 Consider an $f$ that is bounded below and where $\nabla f$ is Lipschitz continuous in the $\infty$-norm, meaning that
 \[
