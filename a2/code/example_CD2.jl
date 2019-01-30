@@ -21,7 +21,11 @@ time_start = time_ns()
 # Compute Lipschitz constant of 'f'
 sd = eigen(X'X)
 # L = maximum(sd.values) + lambda;
-L = maximum(sum(X.^2,dims=1))+lambda;
+# L = maximum(sum(X.^2,dims=1))+lambda;
+L_store = sum(X.^2,dims=1)
+# @printf(" %f\n",maximum(sum(X.^2,dims=1)))
+# @printf("%f\n",minimum(sum(X.^2,dims=1)))
+# L = sum(sum(X.^2,dims=1))+lambda;
 # Start running coordinate descent
 w_old = copy(w);
 Xw = zeros(n,1);
@@ -34,10 +38,10 @@ for k in 1:maxPasses*d
      
      g = X'*r + lambda*w
      g_j = g[j];
- 
+    L = L_store[j]+ lambda
      # Update variable
     w_j = w[j]
-    w[j] = w[j] - (1/L)*g_j
+    w[j] = w[j] - (2/(L))*g_j
     global r = r + X[:,j]*(w[j]-w_j)
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial

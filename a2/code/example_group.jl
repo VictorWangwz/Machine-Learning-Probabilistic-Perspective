@@ -27,3 +27,4 @@ nFeaturesUsed = sum(sum(abs.(model.w),dims=2) .!= 0)
 using PyPlot
 imshow(model.w);
 display(gcf())
+show()

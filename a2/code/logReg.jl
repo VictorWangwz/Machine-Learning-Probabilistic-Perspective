@@ -178,8 +178,7 @@ function softmaxClassifierGL1(X,y,lambda)
 	W = zeros(d,k)
 
 	funObj(w) = softmaxObj(w,X,y,k)
-	groups = repeat(1:d, k)
-	W[:] = proxGradGroupL1(funObj,W[:],lambda, groups, maxIter=500)
+	W[:] = proxGradGroupL1(funObj,W[:],lambda,d,k,maxIter=500)
 
 	# Make linear prediction function
 	predict(Xhat) = mapslices(argmax,Xhat*W,dims=2)
@@ -191,18 +190,24 @@ end
 
 
 
-function softThreshhold(w, groups, param)
-	d =  length(w)
-	n = maximum(groups)
-	v = zeros(n)
-	for j in 1:d
-		v[groups[j]] +=w[j]^2
+function softThreshhold(w, d, k, threshold)
+	# k groups
+	# d features
+	v = zeros(k)
+	n = length(w)
+	for j in 1:k
+		for i in 1:d
+			v[j] +=w[(i-1)*5+j]^2
+		end
+		
 	end
 	v = sqrt.(v)
-	wNew = zeros(d,1)
-	for g in 1:n
-		if v[g]!=0
-			wNew[groups.==g] = (w[groups.==g]./v[g])*maximum([0 v[g] - param])
+	wNew = zeros(n,1)
+	for j in 1:k
+		if v[j] !=0
+			for i in 1:d
+				wNew[(i-1)*5+j] = abs(w[(i-1)*5+j]/v[j]) * maximum([0 v[j]-threshold])
+			end
 		end
 	end
 	return wNew
@@ -210,7 +215,7 @@ function softThreshhold(w, groups, param)
 end
 
 
-function proxGradGroupL1(funObj,w,lambda, groups;maxIter=100,epsilon=1e-2)
+function proxGradGroupL1(funObj,w,lambda, d, k;maxIter=100,epsilon=1e-2)
 	# funObj: function that returns (objective,gradient)
 	# w: initial guess
 	# lambda: value of L1-regularization parmaeter
@@ -224,23 +229,21 @@ function proxGradGroupL1(funObj,w,lambda, groups;maxIter=100,epsilon=1e-2)
 	gamma = 1e-4
 	alpha = 1
 	for i in 1:maxIter
-		wNew = softThreshhold(w, groups, lambda*alpha)
-		# # Gradient step on smoooth part
-		# wNew = w - alpha*g
 
-		# # Proximal step on non-smooth part
-		# wNew = sign.(wNew).*max.(abs.(wNew) .- lambda*alpha,0)
+		# Gradient step on smoooth part
+		wNew = softThreshhold(w-alpha*g, d, k, alpha*lambda)
+		# print(wNew,"/n")
+		# Proximal step on non-smooth part
 		(fNew,gNew) = funObj(wNew)
 
 		# Decrease the step-size if we increased the function
 		gtd = dot(g,wNew-w)
-		while fNew + lambda* newNorm(wNew, groups)> f + lambda*newNorm(wNew, groups) - gamma*alpha*gtd
+		while fNew + lambda*groupNorm(wNew,d,k) > f + lambda*groupNorm(wNew, d, k) - gamma*alpha*gtd
 			@printf("Backtracking\n")
 			alpha /= 2
-			wNew = softThreshhold(w, groups, lambda*alpha)
-			# # Try out the smaller step-size
-			# wNew = w - alpha*g
-			# wNew = sign.(wNew).*max.(abs.(wNew) .- lambda*alpha,0)
+
+			# Try out the smaller step-size
+			wNew = softThreshhold(w- alpha*g, d, k, alpha*lambda)
 			(fNew,gNew) = funObj(wNew)
 		end
 
@@ -272,12 +275,16 @@ function proxGradGroupL1(funObj,w,lambda, groups;maxIter=100,epsilon=1e-2)
 	return w
 end
 
-function newNorm(w, groups)
-	d = length(w)
-	n = maximum(groups)
-	v = zeros(n)
-	for j in 1:d
-		v[groups[j]] += w[j]^2
+
+function groupNorm(w, d, k)
+	v = zeros(k)
+	n = length(w)
+	for j in 1:k
+		for i in 1:d
+			v[j] +=w[(i-1)*5+j]^2
+		end
+		
 	end
-	return sum(sqrt.(v))
+	v = sqrt.(v)
+	return sum(v)
 end
