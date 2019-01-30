@@ -20,7 +20,7 @@ verbose = true
 time_start = time_ns()
 
 gamma = 1e-4
-alpha = 1
+alpha = ones(d)
 
 # Start running coordinate descent
 w_old = copy(w);
@@ -36,24 +36,24 @@ for k in 1:maxPasses*d
 
     # Try out the current step-size
     wNew = copy(w)
-    wNew[j] -= alpha*g_j
-    (fNew, rNew) = getfNew(X, wNew, alpha, g_j, j, r, lambda)
+    wNew[j] -= alpha[j]*g_j
+    (fNew, rNew) = getfNew(X, wNew, alpha[j], g_j, j, r, lambda)
 
     # Decrease the step-size if we increased the function
     gg = g_j*g_j
-    while fNew > f - gamma*alpha*gg
+    while fNew > f - gamma*alpha[j]*gg
 
 	# Fit a degree-2 polynomial to set step-size
-	global alpha = alpha^2*gg/(2(fNew - f + alpha*gg))
+	global alpha[j] = alpha[j]^2*gg/(2(fNew - f + alpha[j]*gg))
 	# Try out the smaller step-size
 	wNew = copy(w)
-	wNew[j] -= alpha*g_j
-	(fNew, rNew) = getfNew(X, wNew, alpha, g_j, j, r, lambda)
+	wNew[j] -= alpha[j]*g_j
+	(fNew, rNew) = getfNew(X, wNew, alpha[j], g_j, j, r, lambda)
     end
 
     # Guess the step-size for the next iteration
-    sub = getNewGj(X, wNew, alpha, g_j, j, r, lambda) - g_j
-    global alpha *= -(sub)/g_j
+    sub = getNewGj(X, wNew, alpha[j], g_j, j, r, lambda) - g_j
+    global alpha[j] *= -(sub)/g_j
     global w = wNew
     global f = fNew
     global r = rNew
