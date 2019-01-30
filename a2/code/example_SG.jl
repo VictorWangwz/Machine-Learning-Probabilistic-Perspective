@@ -12,26 +12,41 @@ maxPasses = 10
 progTol = 1e-4
 verbose = true
 w = zeros(d,1)
+L = maximum(sum(X.^2,dims=1))/4+lambda;
 lambda_i = lambda/n # Regularization for individual example in expectation
-
+# w_store = zeros(maxPasses*n,d)
 # Start running stochastic gradient
+delta = 1
+D = fill(delta, (d,1))
 w_old = copy(w);
-w_saved = zeros(maxPasses*n, d)
+
+# Q4
+v = zeros(n, d)
+g = zeros(d, 1)
 for k in 1:maxPasses*n
-    w_saved[k, :] = w
+    # w_store[k, :] = w
     # Choose example to update 'i'
     i = rand(1:n)
 
     # Compute gradient for example 'i'
     r_i = -y[i]/(1+exp(y[i]*dot(w,X[i,:])))
     g_i = r_i*X[i,:] + (lambda_i)*w
-
+    global g  = g - v[i, :] + g_i
+    v[i,:] = g_i
     # Choose the step-size
     # alpha = 1/(lambda_i*k)
-    alpha = 2*10^-4
-
+    # Q1. Manually choose alpha
+    alpha = 10^-3
+    # # Q3. use AdaGrad
+    # D_new  = D
+    # D_new += g_i .^2
+    # D_new = 1 ./sqrt.(D_new)
     # Take thes stochastic gradient step
-    global w -= alpha*g_i
+    # global w -= alpha*D_new .* g_i
+    global w -= alpha/n* g
+    # Q2.
+    # aver = sum(w)/d
+    # w = fill(aver, size(w))
 
     # Check for lack of progress after each "pass"
     if mod(k,n) == 0
