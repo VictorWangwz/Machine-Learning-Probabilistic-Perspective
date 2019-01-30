@@ -38,10 +38,11 @@ for k in 1:maxPasses*d
      
      g = X'*r + lambda*w
      g_j = g[j];
+
     L = L_store[j]+ lambda
      # Update variable
     w_j = w[j]
-    w[j] = w[j] - (2/(L))*g_j
+    w[j] = w[j] - (1/(L))*g_j
     global r = r + X[:,j]*(w[j]-w_j)
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
