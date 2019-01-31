@@ -14,6 +14,8 @@ verbose = true
 w = zeros(d,1)
 lambda_i = lambda/n # Regularization for individual example in expectation
 
+sumGrad = zeros(d, 1)
+
 # Start running stochastic gradient
 w_old = copy(w);
 for k in 1:maxPasses*n
@@ -26,10 +28,18 @@ for k in 1:maxPasses*n
     g_i = r_i*X[i,:] + (lambda_i)*w
 
     # Choose the step-size
-    alpha = 1/(lambda_i*k)
+    alpha = 0.03
+    delta = 0.05
+
+    global sumGrad += g_i.^2
+
+    D = zeros(d, d)
+    for j in 1:d
+	D[j,j] = 1/sqrt(delta+sumGrad[j])
+    end
 
     # Take thes stochastic gradient step
-    global w -= alpha*g_i
+    global w -= alpha*D*g_i
 
     # Check for lack of progress after each "pass"
     if mod(k,n) == 0
