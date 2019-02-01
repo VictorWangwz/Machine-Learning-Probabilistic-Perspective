@@ -29,7 +29,7 @@ for k in 1:maxPasses*n
 
     # Choose the step-size
     alpha = 0.03
-    delta = 0.05
+    delta = 1
 
     global sumGrad += g_i.^2
 

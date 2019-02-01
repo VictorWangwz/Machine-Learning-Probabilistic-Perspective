@@ -33,7 +33,8 @@ for k in 1:maxPasses*n
     v[:,i] = g_i
 
     # Choose the step-size
-    alpha = 1/L
+    # alpha = 1/L   
+    alpha = 10^-3
 
     # Take thes stochastic gradient step
     global w -= alpha*g./n
