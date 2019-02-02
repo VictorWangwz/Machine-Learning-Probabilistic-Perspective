@@ -1,6 +1,5 @@
 # Load X and y variable
 using JLD, Printf, LinearAlgebra
-include("help.jl")
 data = load("binaryData.jld")
 (X,y) = (data["X"],data["y"])
 
@@ -19,50 +18,37 @@ verbose = true
 # Start timer
 time_start = time_ns()
 
-gamma = 1e-4
-alpha = ones(d)
-
+# Compute Lipschitz constant of 'f'
+sd = eigen(X'X)
+# L = maximum(sd.values) + lambda;
+# L = maximum(sum(X.^2,dims=1))+lambda;
+L_store = sum(X.^2,dims=1)
+# @printf(" %f\n",maximum(sum(X.^2,dims=1)))
+# @printf("%f\n",minimum(sum(X.^2,dims=1)))
+# L = sum(sum(X.^2,dims=1))+lambda;
 # Start running coordinate descent
 w_old = copy(w);
-r = X*w - y
-f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
+Xw = zeros(n,1);
+r = Xw - y
 for k in 1:maxPasses*d
+     # Choose variable to update 'j'
+     j = rand(1:d)
 
-    # Choose variable to update 'j'
-    j = rand(1:d)
+     # Compute partial derivative 'g_j'
+     
+     g = X'*r + lambda*w
+     g_j = g[j];
 
-    Xj = X'[j,:]
-    g_j =(reshape(Xj, 1, length(Xj))*r)[1,1] + lambda*w[j]
-
-    # Try out the current step-size
-    wNew = copy(w)
-    wNew[j] -= alpha[j]*g_j
-    (fNew, rNew) = getfNew(X, wNew, alpha[j], g_j, j, r, lambda)
-
-    # Decrease the step-size if we increased the function
-    gg = g_j*g_j
-    while fNew > f - gamma*alpha[j]*gg
-
-	# Fit a degree-2 polynomial to set step-size
-	global alpha[j] = alpha[j]^2*gg/(2(fNew - f + alpha[j]*gg))
-	# Try out the smaller step-size
-	wNew = copy(w)
-	wNew[j] -= alpha[j]*g_j
-	(fNew, rNew) = getfNew(X, wNew, alpha[j], g_j, j, r, lambda)
-    end
-
-    # Guess the step-size for the next iteration
-    sub = getNewGj(X, wNew, alpha[j], g_j, j, r, lambda) - g_j
-    global alpha[j] *= -(sub)/g_j
-    global w = wNew
-    global f = fNew
-    global r = rNew
-
+    L = L_store[j]+ lambda
+     # Update variable
+    w_j = w[j]
+    w[j] = w[j] - (1/(L))*g_j
+    global r = r + X[:,j]*(w[j]-w_j)
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
     if mod(k,d) == 0
-        global r = X*w - y
-        global f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
+        # r = X*w - y
+        f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
         delta = norm(w-w_old,Inf);
         if verbose
             @printf("Passes = %d, function = %.4e, change = %.4f\n",k/d,f,delta);
@@ -75,6 +61,4 @@ for k in 1:maxPasses*d
     end
 
 end
-
-# End timer
 @printf("Seconds = %f\n",(time_ns()-time_start)/1.0e9)
