@@ -26,7 +26,7 @@ for k in 1:maxPasses*n
     g_i = r_i*X[i,:] + (lambda_i)*w
 
     # Choose the step-size
-    alpha = 0.0002
+    alpha = 0.001
 
     # Take thes stochastic gradient step
     global w -= alpha*g_i

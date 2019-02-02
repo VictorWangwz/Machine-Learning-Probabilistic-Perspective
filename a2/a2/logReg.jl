@@ -145,7 +145,7 @@ function logRegSoftmaxGL1(X,y,lambda)
 
 	funObj(w) = softmaxObjGL1(w,X,y,k)
 
-	W[:] = findMinGL1(funObj,W[:],d,k,lambda,maxIter=500)
+	W[:] = proxGradGroupL1(funObj,W[:],d,k,lambda,maxIter=500)
 
 	# Make linear prediction function
 	predict(Xhat) = mapslices(argmax,Xhat*W,dims=2)

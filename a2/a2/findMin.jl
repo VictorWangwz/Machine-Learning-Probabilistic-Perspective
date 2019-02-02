@@ -146,7 +146,7 @@ function findMinL1(funObj,w,lambda;maxIter=100,epsilon=1e-2)
 	return w
 end
 
-function findMinGL1(funObj,w,d,k,lambda;maxIter=100,epsilon=1e-2)
+function proxGradGroupL1(funObj,w,d,k,lambda;maxIter=100,epsilon=1e-2)
 	# funObj: function that returns (objective,gradient)
 	# w: initial guess
 	# lambda: value of L1-regularization parmaeter
