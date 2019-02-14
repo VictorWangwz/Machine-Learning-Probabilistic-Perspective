@@ -6,8 +6,8 @@ data = load("gaussNoise.jld")
 
 # Fit a KNN classifier
 k = 1
-include("knn.jl")
-model = knn(X,y,k)
+include("GDA.jl")
+model = GDA(X,y)
 
 # Evaluate training error
 yhat = model.predict(X)
