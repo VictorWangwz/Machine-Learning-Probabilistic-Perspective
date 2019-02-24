@@ -4,8 +4,10 @@ using JLD, PyPlot
 data = load("mixtureData.jld")
 X = data["X"]
 
-include("gaussianDensity.jl")
-model = gaussianDensity(X)
+# include("gaussianDensity.jl")
+# model = gaussianDensity(X)
+include("gaussianMixture_z.jl")
+model = gaussianMixture(X)
 
 # Plot data and densities (you can ignore the code below)
 plot(X[:,1],X[:,2],".")
@@ -26,3 +28,4 @@ z = model.pdf([xValues[:] yValues[:]])
 zValues = reshape(z,size(xValues))
 
 contour(xValues,yValues,zValues)
+display(gcf())
