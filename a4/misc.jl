@@ -13,6 +13,10 @@ mutable struct DensityModel
 	pdf # Function that gives PDF
 end
 
+mutable struct SampleModel
+	sample # Funcntion that samples
+end
+
 # Function to compute the mode of a vector
 function mode(x)
 	# Returns mode of x
@@ -70,5 +74,5 @@ end
 
 ### For vector p given discrete probabilities, generates a random sample
 function sampleDiscrete(p)
-	minimum(find(cumsum(p[:]).> rand()))
+	findfirst(cumsum(p[:]).> rand())
 end
