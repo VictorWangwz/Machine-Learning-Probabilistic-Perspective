@@ -1,5 +1,5 @@
 using LinearAlgebra
-
+include("misc.jl") # Includes mode function and GenericModel typedef
 function GDA(X, Y)
 
 	(n, d) = size(X)
