@@ -3,7 +3,7 @@ include("misc.jl") # Includes mode function and GenericModel typedef
 
 function gaussianMixture(X)
     (n,d) = size(X)
-    k = 3
+    k = 4
     p_c = 1/k * ones(k,1)
     iter = 100
     mu = 10*rand(k, d)
