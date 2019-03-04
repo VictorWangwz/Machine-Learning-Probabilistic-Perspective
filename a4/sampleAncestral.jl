@@ -9,7 +9,7 @@ function sampleAncestral(p0, pt, t)
     d = size(pt, 1) ;
     X = ones(Int64, t, d)
     CDF = ones(d)
-
+    prob = ones(Float64, d, d)
     for i in 1:t
         CDF[1] = p0[1]
         CDF = calculateCDF(CDF, p0, d)
@@ -22,16 +22,15 @@ function sampleAncestral(p0, pt, t)
             X[i, j] = findfirst(x->(x>=random_prob), CDF)
         end
     end
-    return X
-end
-    # for i in 1: t
-    #     if rand() > p0[1]
-    #         X[i, 1] = 2
-    #     end
-    #     for j in 2:d
-    #         if rand() > pt[X[i, j-1], j-1]
-    #             X[i, j] = 2
-    #         end 
-    #     end
+    prod2 = ones(Float64, d)
+    
+    for i in 1:d
+        prod2[i] = float(size(findall(x->x==i, X))[1]/(t*d))
+        for j in 1:d
+            prob[i, j] = float(size(findall(x->x==j, X[:, i]))[1]/t)
+        end
+    end
 
-    # end
+    print(prod2)
+    return prob
+end
