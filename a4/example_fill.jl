@@ -29,31 +29,55 @@ n = size(X,3)
 
 
 # Train a tabular DAG model
+# model = Array{Any}(undef, m, m)
+# include("tabular.jl")
+# for i in 1:m
+#     for j in 1: m
+#         h_l = max(1, j-2)
+#         w_l = max(1, i-2)
+#         h = j - h_l + 1
+#         w = i - w_l + 1
+#         d = h*w
+#         X_patch = zeros(n, d-1)
+#         y_patch = zeros(n, 1)
+#         k = 1
+#         for a in w_l: i
+#             for b in h_l: j
+#                 if (a==i)&&(b==j)
+#                     y_patch[:] = X[a, b, :]
+#                     continue
+#                 end
+#                 X_patch[:, k] = X[a, b, :]
+#                 k = k + 1 
+#             end
+#         end
+#         model[i, j] = tabular(X_patch, y_patch)
+#     end
+# end
+
+# Train a sigmoid belief net DAG model
 model = Array{Any}(undef, m, m)
-include("tabular.jl")
+include("logReg.jl")
 for i in 1:m
     for j in 1: m
-        h_l = max(1, j-2)
-        w_l = max(1, i-2)
-        h = j - h_l + 1
-        w = i - w_l + 1
-        d = h*w
+        d = i*j
         X_patch = zeros(n, d-1)
         y_patch = zeros(n, 1)
         k = 1
-        for a in w_l: i
-            for b in h_l: j
+        for a in 1: i
+            for b in 1: j
                 if (a==i)&&(b==j)
-                    y_patch[:] = X[i, j, :]
+                    y_patch[:] = X[a, b, :]
                     continue
                 end
-                X_patch[:, k] = X[i, j, :]
+                X_patch[:, k] = X[a, b, :]
                 k = k + 1 
             end
         end
-        model[i, j] = tabular(X_patch, y_patch)
+        model[i, j] = logReg(X_patch,y_patch)
     end
 end
+
 
 # Show Bernoulli parameters
 figure(1)
@@ -92,26 +116,48 @@ for image in 1:4
     # end
 
     # Fill in the bottom half using the model of tabular
+    # for i in 1:m
+    #     for j in 1:m
+    #         if isnan(I[i,j])
+    #             h_l = max(1, j-2)
+    #             w_l = max(1, i-2)
+    #             h = j - h_l + 1
+    #             w = i - w_l + 1
+    #             d = h*w
+    #             I_patch = zeros(d-1)
+    #             k = 1
+    #             for a in w_l: i
+    #                 for b in h_l: j
+    #                     if (a==i)&&(b==j)
+    #                         continue
+    #                     end
+    #                     I_patch[k] = I[a, b]
+    #                     k = k + 1 
+    #                 end
+    #             end
+    #             I[i,j] = model[i, j].sample(I_patch)
+    #         end
+    #     end
+    # end
+
+
+    # Fill in the bottom half using the model of sigmoid belief network
     for i in 1:m
         for j in 1:m
             if isnan(I[i,j])
-                h_l = max(1, j-2)
-                w_l = max(1, i-2)
-                h = j - h_l + 1
-                w = i - w_l + 1
-                d = h*w
-                X_patch = zeros(n, d-1)
+                d = i*j
+                I_patch = zeros(d-1)
                 k = 1
-                for a in w_l: i
-                    for b in h_l: j
+                for a in 1: i
+                    for b in 1: j
                         if (a==i)&&(b==j)
                             continue
                         end
-                        X_patch[:, k] = X[i, j, :]
+                        I_patch[k] = I[a, b]
                         k = k + 1 
                     end
                 end
-                I[i,j] = model[i, j].sample(X_patch)
+                I[i,j] = model[i, j].sample(I_patch)
             end
         end
     end
