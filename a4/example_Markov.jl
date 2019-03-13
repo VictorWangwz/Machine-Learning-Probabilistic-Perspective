@@ -3,14 +3,16 @@ using JLD, PyPlot
 data = load("gradChain.jld")
 (p1,pt) = (data["p1"],data["pt"])
 k = length(p1)
+time = 500
+num_sample = 1000
 include("sampleAncestral.jl")
-prob = sampleAncestral(p1, pt, 1000, 500)
+# prob = sampleAncestral(p1, pt, num_sample, time)
 n = size(p1)[1]
+
+print("\n")
+include("marginalCK.jl")
+prob = marginalCK(p1, pt, time)
 for i in 1:n
-    plot(range(1, stop=500, length=500), prob[i,:])
+    plot(range(1, stop=time, length=time), prob[i,:])
 end
 display(gcf())
-# print(sampleAncestral(p1, pt, 50, 1000))
-# print("\n")
-# include("marginalCK.jl")
-# print(marginalCK(p1, pt, 50))
