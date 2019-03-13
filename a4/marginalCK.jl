@@ -6,6 +6,6 @@ function marginalCK(p1, pt, t)
 
         M[:,i] = pt' * M[:, i-1]
     end
-    return M
+    return M[:, t]
 
 end

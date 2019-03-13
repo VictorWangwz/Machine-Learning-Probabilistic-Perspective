@@ -1,36 +1,28 @@
-function calculateCDF(CDF, p, d)
+function calculateCDF(p, d)
     for i in 2: d
-        CDF[i] = CDF[i-1] + p[i]
+        p[i] = p[i-1] + p[i]
     end
-    return CDF
+    return p
 end
 
-function sampleAncestral(p0, pt, t)
-    d = size(pt, 1) ;
-    X = ones(Int64, t, d)
-    CDF = ones(d)
-    prob = ones(Float64, d, d)
+function sampleAncestral(p0, pt, t, d)
+    n = size(pt, 1) ;
+    mcs = ones(Int64, t, d)
+    prob = ones(Float64, n, d)
     for i in 1:t
-        CDF[1] = p0[1]
-        CDF = calculateCDF(CDF, p0, d)
-        random_prob = rand()
-        X[i, 1] = findfirst(x->(x>=random_prob), CDF)
-        CDF[1] = pt[X[i, 1]]
-        for j in 2:d
-            CDF = calculateCDF(CDF, pt[X[i, 1],:], d)
-            random_prob = rand()
-            X[i, j] = findfirst(x->(x>=random_prob), CDF)
-        end
-    end
-    prod2 = ones(Float64, d)
-    
-    for i in 1:d
-        prod2[i] = float(size(findall(x->x==i, X))[1]/(t*d))
+        p0_new = p0
         for j in 1:d
-            prob[i, j] = float(size(findall(x->x==j, X[:, i]))[1]/t)
+            cdf = calculateCDF(p0_new, n)
+            r = rand()
+            index = findfirst(x->(x>=r),cdf)
+            mcs[i, j] = index
+            p0_new = pt[index, :]
         end
     end
-
-    print(prod2)
+    for i in 1:d
+        for j in 1:n
+            prob[j, i] = size(findall(x -> x==j, mcs[:, i]))[1]/t
+        end
+    end
     return prob
 end

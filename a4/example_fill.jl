@@ -1,7 +1,10 @@
 # Load X and y variable
 using JLD, PyPlot
 data = load("MNIST_images.jld")
-(X,Xtest) = (data["X"],data["Xtest"])
+(X,Xtest) = (data["X"][:,:,10
+
+
+],data["Xtest"])
 
 m = size(X,1)
 n = size(X,3)
