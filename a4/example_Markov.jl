@@ -11,7 +11,10 @@ n = size(p1)[1]
 
 print("\n")
 include("marginalCK.jl")
-prob = marginalCK(p1, pt, time)
+# prob = marginalCK(p1, pt, time)
+
+include("viterbiDecoding.jl")
+prob, index = viterbiDecoding(p1, pt, time)
 for i in 1:n
     plot(range(1, stop=time, length=time), prob[i,:])
 end
