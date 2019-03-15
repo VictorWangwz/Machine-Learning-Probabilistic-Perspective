@@ -10,7 +10,7 @@ function sampleAncestral(p0, pt, t, d)
     mcs = ones(Int64, t, d)
     prob = ones(Float64, n, d)
     for i in 1:t
-        p0_new = p0
+        p0_new = copy(p0)
         for j in 1:d
             cdf = calculateCDF(p0_new, n)
             r = rand()
@@ -24,5 +24,5 @@ function sampleAncestral(p0, pt, t, d)
             prob[j, i] = size(findall(x -> x==j, mcs[:, i]))[1]/t
         end
     end
-    return prob
+    return prob, mcs
 end
