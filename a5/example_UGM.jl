@@ -1,20 +1,22 @@
 # Load X and y variable
-using JLD
+using JLD, PyPlot
 data = load("PINS.jld")
 X = data["X"]
-
-(n,d) = size(X)
+(n,d) = size(X) 
 
 # We bave 1o digits
 k = 10
 
 # E is our list of edges:
 #   - a (number of edges) by 2 matrix
+
+
 #   - in column 1 you put the first node on the edge
 #   - in column 2 you put the second node on the edge
 #   For example, if you just want the edges 1-2 and 1-3, use:
 #   - edges = [1 2;1 3]
-E = zeros(0,2) # Empty graph
+# E = zeros(0,2) # Empty graph
+E = [1 2; 1 3; 1 4; 2 3; 2 4;3 4]
 nEdges = size(E,1)
 
 # Compute sufficient statistics
